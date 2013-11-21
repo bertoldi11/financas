@@ -43,6 +43,10 @@
                             array('label'=>'Conta', 'url'=>array('/conta/index'), 'visible'=>!Yii::app()->user->isGuest),
                             array('label'=>'Forma de Pagamento', 'url'=>array('/formapgto/index'), 'visible'=>!Yii::app()->user->isGuest),
                         )),
+                        array('label'=>'Movimentação', 'items'=>array(
+                            array('label'=>'Lançamento', 'url'=>array('/movimentacao/index'), 'visible'=>!Yii::app()->user->isGuest),
+                            array('label'=>'Compra Cartão Crédito', 'url'=>array('/compracartao/index'), 'visible'=>!Yii::app()->user->isGuest),
+                        )),
                         array('label'=>'Login', 'url'=>array('/site/login'), 'visible'=>Yii::app()->user->isGuest),
                         array('label'=>'Logout ('.Yii::app()->user->name.')', 'url'=>array('/site/logout'), 'visible'=>!Yii::app()->user->isGuest)
                     ),

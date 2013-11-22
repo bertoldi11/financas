@@ -23,13 +23,40 @@ class ContaController extends Controller
     {
         return array(
             array('allow', // allow authenticated user to perform 'create' and 'update' actions
-                'actions'=>array('novo','alterar','index', 'delete'),
+                'actions'=>array('novo','alterar','index', 'delete','listar'),
                 'users'=>array('@'),
             ),
             array('deny',  // deny all users
                 'users'=>array('*'),
             ),
         );
+    }
+
+    public function actionListar()
+    {
+        $dados = array('CONTAS'=>array());
+
+        $criteria = new CDbCriteria(array(
+            'condition'=>'idTipoMovimentacao = :idTipoMovimentacao',
+            'params'=>array(':idTipoMovimentacao'=>$_POST['idTipoMovimentacao'])
+        ));
+
+        $model = Conta::model()->findAll($criteria);
+
+        if($model)
+        {
+            foreach($model as $conta)
+            {
+                $dados['CONTAS'][]=array(
+                    'idConta'=>$conta->idConta,
+                    'descricao'=>$conta->descricao
+                );
+            }
+        }
+
+        echo CJSON::encode($dados);
+
+        Yii::app()->end();
     }
 
     /**

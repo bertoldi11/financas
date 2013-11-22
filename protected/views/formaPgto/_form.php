@@ -1,6 +1,7 @@
 <?php $form=$this->beginWidget('bootstrap.widgets.TbActiveForm',array(
 	'id'=>'forma-pgto-form',
 	'enableAjaxValidation'=>false,
+    'action'=>$model->isNewRecord ? $this->createUrl('formapgto/novo') : $this->createUrl('formapgto/alterar',array('id'=>$model->idFormaPgto))
 )); ?>
 
 <p class="help-block">Campos com <span class="required">*</span> são obrigatórios.</p>

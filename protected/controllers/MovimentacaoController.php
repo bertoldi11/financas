@@ -3,6 +3,7 @@
 class MovimentacaoController extends Controller
 {
     public $_model = null;
+    public $tipoMovimentacao = null;
 
     /**
      * @return array action filters
@@ -77,6 +78,7 @@ class MovimentacaoController extends Controller
             }
         }
 
+        $this->tipoMovimentacao = $model->idConta0->idTipoMovimentacao;
         $this->_model = $model;
         $this->actionIndex();
     }
@@ -106,13 +108,33 @@ class MovimentacaoController extends Controller
      */
     public function actionIndex()
     {
+        $dataContas = array();
+        $promptConta ='Selecione o Tipo de Movimentação';
+        if(isset($_POST['tipoMovimento']) || !is_null($this->tipoMovimentacao))
+        {
+            $_POST['tipoMovimento'] = (!is_null($this->tipoMovimentacao)) ? $this->tipoMovimentacao : $_POST['tipoMovimento'];
+            $criteria = new CDbCriteria(array(
+                'condition'=>'idTipoMovimentacao = :idTipoMovimentacao',
+                'params'=>array(':idTipoMovimentacao'=>$_POST['tipoMovimento'])
+            ));
+
+            $dataContas = CHtml::listdata(Conta::model()->findAll($criteria), 'idConta','descricao');
+            $promptConta='Selecione';
+        }
+
         $model=(is_null($this->_model)) ? new Movimentacao : $this->_model;
-        $dataProvider=new CActiveDataProvider('Movimentacao');
+        $model->valor = Formatacao::formatMoeda($model->valor);
+        $model->data = Formatacao::formatData($model->data);
+        $dataProvider=new CActiveDataProvider('Movimentacao', array('criteria'=>array(
+            'with'=>array('idConta0', 'idConta0.idTipoMovimentacao0')
+        )));
         $this->render('index',array(
             'dataProvider'=>$dataProvider,
             'model'=>$model,
             'dataTipoMovimentacao'=>CHtml::listData(Tipomovimentacao::model()->findAll(),'idTipoMovimentacao','descricao'),
-            'dataFormasPgto'=>CHtml::listData(FormaPgto::model()->findAll(),'idFormaPgto','descricao')
+            'dataFormasPgto'=>CHtml::listData(FormaPgto::model()->findAll(),'idFormaPgto','descricao'),
+            'dataContas'=>$dataContas,
+            'promptConta'=>$promptConta
         ));
     }
 
@@ -123,7 +145,7 @@ class MovimentacaoController extends Controller
      */
     public function loadModel($id)
     {
-        $model=Movimentacao::model()->findByPk($id);
+        $model=Movimentacao::model()->with('idConta0')->findByPk($id);
         if($model===null)
             throw new CHttpException(404,'The requested page does not exist.');
         return $model;

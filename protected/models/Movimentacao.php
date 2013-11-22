@@ -45,6 +45,15 @@ class Movimentacao extends CActiveRecord
 		);
 	}
 
+    public function beforeValidate()
+    {
+        parent::beforeValidate();
+        $this->idUsuario = Yii::app()->user->idUsuario;
+        $this->valor = str_replace(',','.',str_replace('.','', $this->valor));
+        $this->data = Formatacao::formatData($this->data,'/','-');
+        return true;
+    }
+
 	/**
 	 * @return array relational rules.
 	 */

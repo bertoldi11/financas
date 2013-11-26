@@ -52,9 +52,17 @@ class CompraCartao extends CActiveRecord
 		// class name for the relations automatically generated below.
 		return array(
 			'idCartaoCredito0' => array(self::BELONGS_TO, 'Cartaocredito', 'idCartaoCredito'),
-			'parcelas' => array(self::HAS_MANY, 'Parcela', 'idCompasCartao'),
+			'parcelas' => array(self::HAS_MANY, 'Parcela', 'idCompraCartao'),
 		);
 	}
+
+    public function beforeValidate()
+    {
+        parent::beforeValidate();
+        $this->valorTotal = str_replace(',','.',str_replace('.','', $this->valorTotal));
+        $this->dataCompra = Formatacao::formatData($this->dataCompra,'/','-');
+        return true;
+    }
 
 	/**
 	 * @return array customized attribute labels (name=>label)

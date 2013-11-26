@@ -1,11 +1,10 @@
 <?php $form=$this->beginWidget('bootstrap.widgets.TbActiveForm',array(
-	'id'=>'compra-cartao-form',
+	'id'=>'fatura-form',
 	'enableAjaxValidation'=>false,
-    'action'=>$model->isNewRecord ? $this->createUrl('compracartao/novo') : $this->createUrl('compracartao/alterar',array('id'=>$model->idCompraCartao))
+    'action'=>$model->isNewRecord ? $this->createUrl('fatura/novo') : $this->createUrl('fatura/alterar',array('id'=>$model->idFatura))
 )); ?>
     <div class="clearfix">
-        <p class="help-block">Campos com <span class="required">*</span> são obrigatórios.</p>
-
+        <p class="help-block">Campos com <span class="required">*</span> são obrigatorios.</p>
         <?php echo $form->errorSummary($model); ?>
     </div>
     <div class="clearfix">
@@ -13,22 +12,18 @@
             <?php echo $form->dropdownListRow($model,'idCartaoCredito',$dataCartao,array('class'=>'span12', 'prompt'=>'Selecione')); ?>
         </div>
         <div class="span3">
-            <?php echo $form->datepickerRow($model,'dataCompra',array(
+            <?php echo $form->datepickerRow($model,'abertura',array(
                     'options' => array('language' => 'pt','format'=>'dd/mm/yyyy'),
                     'prepend' => '<i class="icon-calendar"></i>',
                 )
             ); ?>
         </div>
-    </div>
-    <div class="clearfix">
-        <div class="span2">
-            <?php echo $form->textFieldRow($model,'aut',array('class'=>'span12','maxlength'=>15)); ?>
-        </div>
-        <div class="span2">
-            <?php echo $form->textFieldRow($model,'quantParcelas',array('class'=>'span12')); ?>
-        </div>
-        <div class="span2">
-            <?php echo $form->textFieldRow($model,'valorTotal',array('class'=>'span12','maxlength'=>8)); ?>
+        <div class="span3">
+            <?php echo $form->datepickerRow($model,'prevFechamento',array(
+                    'options' => array('language' => 'pt','format'=>'dd/mm/yyyy'),
+                    'prepend' => '<i class="icon-calendar"></i>',
+                )
+            ); ?>
         </div>
     </div>
     <div class="clearfix">

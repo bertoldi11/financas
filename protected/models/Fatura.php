@@ -5,19 +5,20 @@
  *
  * The followings are the available columns in table 'fatura':
  * @property integer $idFatura
- * @property integer $idCartoCredito
+ * @property integer $idCartaoCredito
  * @property string $abertura
  * @property string $prevFechamento
  * @property string $status
  * @property string $totalPagar
  *
  * The followings are the available model relations:
- * @property Cartaocredito $idCartoCredito0
+ * @property Cartaocredito $idCartaoCredito0
  * @property Movimentacao[] $movimentacaos
  * @property Parcela[] $parcelas
  */
 class Fatura extends CActiveRecord
 {
+    public $formataData = true;
 	/**
 	 * @return string the associated database table name
 	 */
@@ -34,13 +35,13 @@ class Fatura extends CActiveRecord
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
 		return array(
-			array('idCartoCredito, abertura, prevFechamento, status', 'required'),
-			array('idCartoCredito', 'numerical', 'integerOnly'=>true),
+			array('idCartaoCredito, abertura, prevFechamento, status', 'required'),
+			array('idCartaoCredito', 'numerical', 'integerOnly'=>true),
 			array('status', 'length', 'max'=>1),
 			array('totalPagar', 'length', 'max'=>7),
 			// The following rule is used by search().
 			// @todo Please remove those attributes that should not be searched.
-			array('idFatura, idCartoCredito, abertura, prevFechamento, status, totalPagar', 'safe', 'on'=>'search'),
+			array('idFatura, idCartaoCredito, abertura, prevFechamento, status, totalPagar', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -52,11 +53,23 @@ class Fatura extends CActiveRecord
 		// NOTE: you may need to adjust the relation name and the related
 		// class name for the relations automatically generated below.
 		return array(
-			'idCartoCredito0' => array(self::BELONGS_TO, 'Cartaocredito', 'idCartoCredito'),
+			'idCartaoCredito0' => array(self::BELONGS_TO, 'Cartaocredito', 'idCartaoCredito'),
 			'movimentacaos' => array(self::HAS_MANY, 'Movimentacao', 'idFatura'),
 			'parcelas' => array(self::HAS_MANY, 'Parcela', 'idFatura'),
 		);
 	}
+
+    public function beforeValidate()
+    {
+        parent::beforeValidate();
+        if($this->formataData)
+        {
+            $this->abertura = Formatacao::formatData($this->abertura,'/','-');
+            $this->prevFechamento = Formatacao::formatData($this->prevFechamento,'/','-');
+        }
+
+        return true;
+    }
 
 	/**
 	 * @return array customized attribute labels (name=>label)
@@ -65,7 +78,7 @@ class Fatura extends CActiveRecord
 	{
 		return array(
 			'idFatura' => 'Id Fatura',
-			'idCartoCredito' => 'Id Carto Credito',
+			'idCartaoCredito' => 'Cartão Crédito',
 			'abertura' => 'Abertura',
 			'prevFechamento' => 'Prev Fechamento',
 			'status' => 'Status',
@@ -92,7 +105,7 @@ class Fatura extends CActiveRecord
 		$criteria=new CDbCriteria;
 
 		$criteria->compare('idFatura',$this->idFatura);
-		$criteria->compare('idCartoCredito',$this->idCartoCredito);
+		$criteria->compare('idCartaoCredito',$this->idCartaoCredito);
 		$criteria->compare('abertura',$this->abertura,true);
 		$criteria->compare('prevFechamento',$this->prevFechamento,true);
 		$criteria->compare('status',$this->status,true);

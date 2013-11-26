@@ -1,6 +1,6 @@
 <?php
 
-class CompraCartaoController extends Controller
+class FaturaController extends Controller
 {
     public $_model = null;
 
@@ -38,57 +38,42 @@ class CompraCartaoController extends Controller
      */
     public function actionNovo()
     {
-        $model=new CompraCartao;
+        $model=new Fatura;
 
-        if(isset($_POST['CompraCartao']))
+        if(isset($_POST['Fatura']))
         {
-            $model->attributes=$_POST['CompraCartao'];
-            if ($model -> save())
+            $totalFaturaAberta = Fatura::model()->count('idCartaoCredito = :idCartaoCredito AND status="A"',array(':idCartaoCredito'=>$_POST['Fatura']['idCartaoCredito']));
+            if($totalFaturaAberta == 0)
             {
-                $criteriaFatura = new CDbCriteria(array(
-                    'condition'=>':dataCompra between abertura and prevFechamento',
-                    'params'=>array(':dataCompra'=>$model->dataCompra)
-                ));
-
-                $modelFatura = Fatura::model()->find($criteriaFatura);
-                $idfatura = (count($modelFatura) > 0) ? $modelFatura->idFatura : null;
-
-                $valorParcela = $model->valorTotal/$model->quantParcelas;
-
-                if(!is_null($idfatura))
+                $model->attributes=$_POST['Fatura'];
+                $model->status = "A";
+                if ($model -> save())
                 {
-                    $modelFatura->formataData = false;
-                    $modelFatura->totalPagar = $modelFatura->totalPagar+$valorParcela;
-                    $modelFatura->save();
+                    $criteriaParcela = new CDbCriteria(array(
+                        'condition'=>'dataVenc BETWEEN :dtInicio AND :dtFim',
+                        'params'=>array(':dtInicio'=>$model->abertura, ':dtFim'=>$model->prevFechamento)
+                    ));
+                    Parcela::model()->updateAll(array('idFatura'=>$model->idFatura), $criteriaParcela);
+
+                    Yii::app()->db->createCommand("UPDATE fatura SET totalPagar = (SELECT SUM(valor) FROM parcela WHERE idFatura=:idFatura) WHERE idFatura=:idFatura")
+                        ->bindValue(':idFatura',$model->idFatura)->execute();
+
+                    Yii::app()->user->setFlash('success', 'Dados Salvos.');
                 }
-
-                unset($criteriaFatura,$modelFatura);
-
-                for($i=0; $i < $model->quantParcelas; $i++)
+                else
                 {
-                    $vencimento = ($i==0) ? $model->dataCompra : new CDbExpression("DATE_ADD('".$model->dataCompra."', INTERVAL ".$i. " MONTH)");
-                    $modelParcela = new Parcela;
-                    $modelParcela->attributes = array(
-                        'idCompraCartao'=>$model->idCompraCartao,
-                        'parcela'=>$i+1,
-                        'valor'=>$valorParcela,
-                        'dataVenc'=>$vencimento,
-                        'idfatura'=>$idfatura
-                    );
-                    $modelParcela->save();
-                    $idfatura = null;
+                    $this->_model = $model;
+                    $this->actionIndex();
+                    exit;
                 }
-                Yii::app()->user->setFlash('success', 'Dados Salvos.');
             }
             else
             {
-                $this->_model = $model;
-                $this->actionIndex();
-                exit;
+                Yii::app()->user->setFlash('error', 'Já existe uma fatura aberta para esse cartão.');
             }
-        }
 
-        $this->redirect($this->createUrl('compracartao/index'));
+        }
+        $this->redirect($this->createUrl('fatura/index'));
     }
 
     /**
@@ -100,13 +85,13 @@ class CompraCartaoController extends Controller
     {
         $model=$this->loadModel($id);
 
-        if(isset($_POST['CompraCartao']))
+        if(isset($_POST['Fatura']))
         {
-            $model->attributes=$_POST['CompraCartao'];
+            $model->attributes=$_POST['Fatura'];
             if ($model -> save())
             {
                 Yii::app()->user->setFlash('success', 'Dados Alterados.');
-                $this->redirect($this->createUrl('compracartao/index'));
+                $this->redirect($this->createUrl('fatura/index'));
             }
         }
 
@@ -139,18 +124,17 @@ class CompraCartaoController extends Controller
      */
     public function actionIndex()
     {
-        $model=(is_null($this->_model)) ? new CompraCartao : $this->_model;
-        $model->valorTotal = Formatacao::formatMoeda($model->valorTotal);
-        $model->dataCompra = Formatacao::formatData($model->dataCompra);
+        $model=(is_null($this->_model)) ? new Fatura : $this->_model;
+        $model->abertura = Formatacao::formatData($model->abertura);
+        $model->prevFechamento = Formatacao::formatData($model->prevFechamento);
 
-        $dataProvider=new CActiveDataProvider('CompraCartao');
+        $dataProvider=new CActiveDataProvider('Fatura');
         $this->render('index',array(
             'dataProvider'=>$dataProvider,
             'model'=>$model,
             'dataCartao'=>CHtml::listData(CartaoCredito::model()->findAll(),'idCartaoCredito','nome')
         ));
     }
-
 
     /**
      * Returns the data model based on the primary key given in the GET variable.
@@ -159,7 +143,7 @@ class CompraCartaoController extends Controller
      */
     public function loadModel($id)
     {
-        $model=CompraCartao::model()->findByPk($id);
+        $model=Fatura::model()->findByPk($id);
         if($model===null)
             throw new CHttpException(404,'The requested page does not exist.');
         return $model;
@@ -171,7 +155,7 @@ class CompraCartaoController extends Controller
      */
     protected function performAjaxValidation($model)
     {
-        if(isset($_POST['ajax']) && $_POST['ajax']==='compra-cartao-form')
+        if(isset($_POST['ajax']) && $_POST['ajax']==='fatura-form')
         {
             echo CActiveForm::validate($model);
             Yii::app()->end();

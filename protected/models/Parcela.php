@@ -5,15 +5,15 @@
  *
  * The followings are the available columns in table 'parcela':
  * @property integer $idParcela
- * @property integer $idCompasCartao
+ * @property integer $idCompraCartao
  * @property integer $idFatura
  * @property integer $parcela
  * @property string $valor
  * @property string $dataVenc
  *
  * The followings are the available model relations:
- * @property Compracartao $idCompasCartao0
  * @property Fatura $idFatura0
+ * @property Compracartao $idCompraCartao0
  */
 class Parcela extends CActiveRecord
 {
@@ -33,12 +33,12 @@ class Parcela extends CActiveRecord
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
 		return array(
-			array('idCompasCartao, parcela, valor, dataVenc', 'required'),
-			array('idCompasCartao, idFatura, parcela', 'numerical', 'integerOnly'=>true),
-			array('valor', 'length', 'max'=>45),
+			array('idCompraCartao, parcela, valor, dataVenc', 'required'),
+			array('idCompraCartao, idFatura, parcela', 'numerical', 'integerOnly'=>true),
+			array('valor', 'length', 'max'=>8),
 			// The following rule is used by search().
 			// @todo Please remove those attributes that should not be searched.
-			array('idParcela, idCompasCartao, idFatura, parcela, valor, dataVenc', 'safe', 'on'=>'search'),
+			array('idParcela, idCompraCartao, idFatura, parcela, valor, dataVenc', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -50,8 +50,8 @@ class Parcela extends CActiveRecord
 		// NOTE: you may need to adjust the relation name and the related
 		// class name for the relations automatically generated below.
 		return array(
-			'idCompasCartao0' => array(self::BELONGS_TO, 'Compracartao', 'idCompasCartao'),
 			'idFatura0' => array(self::BELONGS_TO, 'Fatura', 'idFatura'),
+			'idCompraCartao0' => array(self::BELONGS_TO, 'Compracartao', 'idCompraCartao'),
 		);
 	}
 
@@ -62,7 +62,7 @@ class Parcela extends CActiveRecord
 	{
 		return array(
 			'idParcela' => 'Id Parcela',
-			'idCompasCartao' => 'Id Compas Cartao',
+			'idCompraCartao' => 'Id Compra Cartao',
 			'idFatura' => 'Id Fatura',
 			'parcela' => 'Parcela',
 			'valor' => 'Valor',
@@ -89,7 +89,7 @@ class Parcela extends CActiveRecord
 		$criteria=new CDbCriteria;
 
 		$criteria->compare('idParcela',$this->idParcela);
-		$criteria->compare('idCompasCartao',$this->idCompasCartao);
+		$criteria->compare('idCompraCartao',$this->idCompraCartao);
 		$criteria->compare('idFatura',$this->idFatura);
 		$criteria->compare('parcela',$this->parcela);
 		$criteria->compare('valor',$this->valor,true);

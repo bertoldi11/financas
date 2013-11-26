@@ -86,5 +86,6 @@ return array(
 	'params'=>array(
 		// this is used in contact page
 		'adminEmail'=>'bertoldi11@gmail.com',
+        'status'=>array('A'=>'Aberto', 'F'=>'Fechado')
 	),
 );

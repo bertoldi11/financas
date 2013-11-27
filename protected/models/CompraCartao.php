@@ -10,6 +10,7 @@
  * @property string $aut
  * @property integer $quantParcelas
  * @property string $valorTotal
+ * @property string $local
  *
  * The followings are the available model relations:
  * @property Cartaocredito $idCartaoCredito0
@@ -33,13 +34,14 @@ class CompraCartao extends CActiveRecord
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
 		return array(
-			array('idCartaoCredito, dataCompra, aut, quantParcelas, valorTotal', 'required'),
+			array('idCartaoCredito, dataCompra, aut, quantParcelas, valorTotal, local', 'required'),
 			array('idCartaoCredito, quantParcelas', 'numerical', 'integerOnly'=>true),
 			array('aut', 'length', 'max'=>15),
 			array('valorTotal', 'length', 'max'=>8),
+            array('local', 'length', 'max'=>100),
 			// The following rule is used by search().
 			// @todo Please remove those attributes that should not be searched.
-			array('idCompraCartao, idCartaoCredito, dataCompra, aut, quantParcelas, valorTotal', 'safe', 'on'=>'search'),
+			array('idCompraCartao, idCartaoCredito, dataCompra, aut, quantParcelas, valorTotal, local', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -76,6 +78,7 @@ class CompraCartao extends CActiveRecord
 			'aut' => 'Autorização',
 			'quantParcelas' => 'Quant Parcelas',
 			'valorTotal' => 'Valor Total',
+            'local'=>'Local da Compra'
 		);
 	}
 
@@ -103,6 +106,7 @@ class CompraCartao extends CActiveRecord
 		$criteria->compare('aut',$this->aut,true);
 		$criteria->compare('quantParcelas',$this->quantParcelas);
 		$criteria->compare('valorTotal',$this->valorTotal,true);
+        $criteria->compare('local',$this->local,true);
 
 		return new CActiveDataProvider($this, array(
 			'criteria'=>$criteria,

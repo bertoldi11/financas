@@ -23,13 +23,50 @@ class FaturaController extends Controller
     {
         return array(
             array('allow', // allow authenticated user to perform 'create' and 'update' actions
-                'actions'=>array('novo','alterar','index', 'delete'),
+                'actions'=>array('novo','alterar','index', 'delete', 'fechar','verParcelas'),
                 'users'=>array('@'),
             ),
             array('deny',  // deny all users
                 'users'=>array('*'),
             ),
         );
+    }
+
+    public function actionVerParcelas($id)
+    {
+        $dados = array('PARCELAS'=>array());
+        $modelParcelas = Parcela::model()->with('idCompraCartao0')->findAll('idFatura=:idFatura', array(':idFatura'=>$id));
+        foreach($modelParcelas as $parcela)
+        {
+            $dados['PARCELAS'][] = array(
+                'descricao'=>$parcela->idCompraCartao0->local,
+                'dataCompra'=> Formatacao::formatData($parcela->idCompraCartao0->dataCompra),
+                'dataParcela'=> Formatacao::formatData($parcela->dataVenc),
+                'parcela'=> $parcela->parcela.' de '.$parcela->idCompraCartao0->quantParcelas,
+                'valor'=> Formatacao::formatMoeda($parcela->valor),
+            );
+        }
+
+        echo CJSON::encode($dados);
+        Yii::app()->end();
+    }
+
+    public function actionFechar($id)
+    {
+        $model = $this->loadModel($id);
+        if($model->status == "A")
+        {
+            $model->formataData = false;
+            $model->status = 'F';
+            $model->save();
+            Yii::app()->user->setFlash('success', 'Fatura Fechada.');
+        }
+        else
+        {
+            Yii::app()->user->setFlash('error', 'Essa fatura não pode ser fechada.');
+        }
+
+        $this->redirect($this->createUrl('fatura/index'));
     }
 
     /**

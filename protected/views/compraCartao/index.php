@@ -18,6 +18,7 @@ $this->breadcrumbs=array(
             'dataProvider'=>$dataProvider,
             'formatter'=>new Formatacao,
             'columns'=>array(
+                array('name'=> 'local', 'header'=>'Local da Compra',),
                 array('name'=> 'idCartaoCredito0.nome', 'header'=>'Cartão',),
                 array('name'=> 'dataCompra', 'header'=>'Data', 'type'=>'data'),
                 array('name'=> 'valorTotal', 'header'=>'Valor', 'type'=>'moeda'),

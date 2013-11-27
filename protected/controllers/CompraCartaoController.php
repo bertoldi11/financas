@@ -51,7 +51,7 @@ class CompraCartaoController extends Controller
                 ));
 
                 $modelFatura = Fatura::model()->find($criteriaFatura);
-                $idfatura = (count($modelFatura) > 0) ? $modelFatura->idFatura : null;
+                $idfatura = ($modelFatura) ? $modelFatura->idFatura : null;
 
                 $valorParcela = $model->valorTotal/$model->quantParcelas;
 
@@ -73,7 +73,7 @@ class CompraCartaoController extends Controller
                         'parcela'=>$i+1,
                         'valor'=>$valorParcela,
                         'dataVenc'=>$vencimento,
-                        'idfatura'=>$idfatura
+                        'idFatura'=>$idfatura
                     );
                     $modelParcela->save();
                     $idfatura = null;

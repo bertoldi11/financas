@@ -7,6 +7,7 @@
         <p class="help-block">Campos com <span class="required">*</span> são obrigatórios.</p>
 
         <?php echo $form->errorSummary($model); ?>
+        <?php echo $form->textFieldRow($model,'local',array('class'=>'span6','maxlength'=>100)); ?>
     </div>
     <div class="clearfix">
         <div class="span3">
